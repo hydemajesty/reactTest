@@ -1,9 +1,14 @@
 import React, { Component } from 'react'
 import Item from '../Item/Iterm'
+import PropTypes from 'prop=types'
 import './List.css'
 
 export default class List extends Component {
-  
+  static propTypes = {
+    todos:PropTypes.array.isRequired,
+    updateTodo:PropTypes.func.isRequired
+  }
+
   render() {
     const{todos,updateTodo} = this.props
     return (
