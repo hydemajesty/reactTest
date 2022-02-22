@@ -1,11 +1,25 @@
-import React from 'react';
+import React, { useEffect,useState,useRef } from 'react';
 
+function CountMyRenders() {
+  const countRenderRef = useRef(1);
+  
+  useEffect(function afterRender() {
+    countRenderRef.current++;
+  });
 
+  return (
+    <div>I've rendered {countRenderRef.current} times</div>
+  );
+}
 
 function App() {
+  const [count, setCount] = useState(0);
   return (
     <div className="App">
-      <h2>My favorite movies</h2>
+      <CountMyRenders />
+      <button onClick={() => setCount(count => count + 1)}>
+        Click to re-render
+      </button>
     </div>
   );
 }
