@@ -1,66 +1,70 @@
-import React, { Component } from 'react'
-import Header  from './Components/Header/Header'
-import List from './Components/List/List'
-import Footer from './Components/Footer/Footer'
-import './App.css'
-export default class App extends Component {
-  
-  state = {todos:[
-		{id:'001',name:'吃饭',done:true},
-		{id:'002',name:'睡觉',done:true},
-		{id:'003',name:'打代码',done:false},
-		{id:'004',name:'逛街',done:false}
-	]}
-  
-  addTodo = (todoObj) => {
-    const {todos} = this.state
-    const newTodos = [todoObj, ...todos]
-    this.setState({todos:newTodos})
-  }
+import React, { useReducer,useState } from 'react';
 
-  updateTodo = (id,done)=>{
-    
-    const {todos} = this.state
-    const newTodos = todos.map((todoObj)=>{
-      if(todoObj.id === id) return {...todoObj,done}
-      else return todoObj
-    })
-    this.setState({todos:newTodos})
-  }
-
-  deleteTodo = (id) =>{
-    const {todos} = this.state
-    const newTodos = todos.filter((todoObj) =>{
-      return todoObj.id !== id
-    })
-    this.setState({todos:newTodos})
-  }
-
-  checkAllTodo = (done)=>{
-    const {todos} = this.state
-    const newTodos = todos.map((todoObj)=>{
-      return {...todoObj,done}
-    })
-    this.setState({todos:newTodos})
-  }
-  clearAllDone = ()=>{
-    const {todos} = this.state
-    const newTodos = todos.filter((todoObj)=>{
-      return !todoObj.done
-    })
-    this.setState({todos:newTodos})
-  }
-  render() {
-    const {todos} = this.state
-    return (
-      <div className="todo-container">
-        <div className="todo-wrap">
-          <Header addTodo={this.addTodo}></Header>
-          <List todos={todos} updateTodo={this.updateTodo} deleteTodo={this.deleteTodo}></List>
-          <Footer todos={todos} clearAllDone={this.clearAllDone} checkAllTodo={this.checkAllTodo}></Footer>
-        </div>
-      </div>
-    )
+function reducer(state, action) {
+  switch (action.type) {
+    case "add":
+      return [...state, action.item];
+    case "remove":
+      return [
+        ...state.slice(0, action.index),
+        ...state.slice(action.index + 1)
+      ];
+    default:
+      throw new Error();
   }
 }
 
+function FavoriteMovies() {
+  const [movies, dispatch] = useReducer(reducer, [{ name: "Heat" }]);
+  const [newMovie, setNewMovie] = useState("");
+
+  const handleAddClick = () => {
+    if (newMovie === "") {
+      return;
+    }
+    dispatch({ type: "add", item: { name: newMovie } });
+    setNewMovie("");
+  };
+
+  return (
+    <>
+      <div className="movies">
+        {movies.map((movie, index) => {
+          return (
+            <Movie
+              movie={movie}
+              onRemove={() => dispatch({ type: "remove", index })}
+            />
+          );
+        })}
+      </div>
+      <div className="add-movie">
+        <input
+          type="text"
+          value={newMovie}
+          onChange={event => setNewMovie(event.target.value)}
+        />
+        <button onClick={handleAddClick}>Add movie</button>
+      </div>
+    </>
+  );
+}
+
+function Movie({ movie, onRemove }) {
+  return (
+    <div className="movie">
+      <span>{movie.name}</span>
+      <button onClick={onRemove}>Remove</button>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div className="App">
+      <h2>My favorite movies</h2>
+      <FavoriteMovies />
+    </div>
+  );
+}
+export default App;
